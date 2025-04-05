@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Form</title>
+</head>
+<body>
+    <h2>Registration Form</h2>
+
+    <form id="registrationForm">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required><br><br>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required><br><br>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br><br>
+
+        <label for="dob">Date of Birth:</label>
+        <input type="date" id="dob" name="dob" required><br><br>
+
+        <label for="terms">Accept Terms and Conditions:</label>
+        <input type="checkbox" id="terms" name="terms" required><br><br>
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <h3>Submitted Data:</h3>
+    <table id="dataTable" border="2">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Password</th>
+                <th>Dob</th>
+                <th>Accepted terms?</th>
+            </tr>
+        </thead>
+        <tbody>
+          
+        </tbody>
+    </table>
+
+    <script>
+       
+        function calculateAge(birthDate) {
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const month = today.getMonth();
+            const day = today.getDate();
+
+            if (month < birthDate.getMonth() || (month === birthDate.getMonth() && day < birthDate.getDate())) {
+                age--;
+            }
+
+            return age;
+        }
+
+       
+        document.getElementById('registrationForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent form from submitting
+
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const dob = document.getElementById('dob').value;
+            const terms = document.getElementById('terms').checked;
+
+           
+            const age = calculateAge(new Date(dob));
+            if (age < 18 || age > 55) {
+                alert('You must be between 18 and 55 years old.');
+                return;
+            }
+
+            // Save data to localStorage
+            const formData = {
+                name,
+                email,
+                password,
+                dob,
+                terms: terms ? 'true' : 'false'
+            };
+
+            let storedData = JSON.parse(localStorage.getItem('formData')) || [];
+            storedData.push(formData);
+            localStorage.setItem('formData', JSON.stringify(storedData));
+
+            // Load data to the table
+            loadTableData();
+
+            // Reset the form
+            document.getElementById('registrationForm').reset();
+        });
+
+        // Function to load data from localStorage to the table
+        function loadTableData() {
+            const tableBody = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = ''; // Clear existing rows
+
+            const storedData = JSON.parse(localStorage.getItem('formData')) || [];
+            storedData.forEach(data => {
+                const row = tableBody.insertRow();
+
+                row.insertCell(0).textContent = data.name;
+                row.insertCell(1).textContent = data.email;
+                row.insertCell(2).textContent = data.password;
+                row.insertCell(3).textContent = data.dob;
+                row.insertCell(4).textContent = data.terms;
+            });
+        }
+
+        // Load the stored data when the page is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTableData();
+        });
+    </script>
+</body>
+</html>
